@@ -18,11 +18,35 @@ from lib2to3 import refactor
 from libmodernize import __version__
 from libmodernize.fixes import lib2to3_fix_names, six_fix_names, opt_in_fix_names
 
+import re
+import json
+
+"""
+re-route stdout
+"""
+
+
+class ListStream:
+    def __init__(self):
+        self.data = {'result': {}, 'original_diff': ''}
+
+    def write(self, s):
+        self.data['original_diff'] += s
+
+    def __enter__(self):
+        sys.stdout = self
+        return self
+
+    def __exit__(self, ext_type, exc_value, traceback):
+        sys.stdout = sys.__stdout__
+
+
 usage = __doc__ + """\
  %s
 
 Usage: modernize [options] file|dir ...
 """ % __version__
+final = {}
 
 
 def format_usage(usage):
@@ -65,7 +89,7 @@ def main(args=None):
                       help="Wrap unicode literals in six.u().")
     parser.add_option("--future-unicode", action="store_true", default=False,
                       help="Use 'from __future__ import unicode_literals'"
-                      "(only useful for Python 2.6+).")
+                           "(only useful for Python 2.6+).")
     parser.add_option("--no-six", action="store_true", default=False,
                       help="Exclude fixes that depend on the six package.")
     parser.add_option("--enforce", action="store_true", default=False,
@@ -180,6 +204,17 @@ def main(args=None):
     print(file=sys.stderr)
 
     # Refactor all files and directories passed as arguments
+    list3 = sorted(fixer_names)
+
+    for n in list(list3):
+        lib23process([n], flags, explicit, options, refactor_stdin, args)
+
+    json_data = json.dumps(final)
+    print(json_data)
+    return
+
+
+def lib23process(fixer_names, flags, explicit, options, refactor_stdin, args):
     rt = StdoutRefactoringTool(sorted(fixer_names), flags, sorted(explicit),
                                options.nobackups, not options.no_diffs)
     if not rt.errors:
@@ -187,9 +222,14 @@ def main(args=None):
             rt.refactor_stdin()
         else:
             try:
-                rt.refactor(args, options.write, options.doctests_only,
-                            options.processes)
-            except refactor.MultiprocessingUnsupported: # pragma: no cover
+
+                with ListStream() as stream:
+                    # stream.data['fixer'] = fixer_names[0];
+                    rt.refactor(args, options.write, options.doctests_only,
+                                options.processes)
+                final[fixer_names[0]] = process_unified_diff(stream.data)
+
+            except refactor.MultiprocessingUnsupported:  # pragma: no cover
                 assert options.processes > 1
                 print("Sorry, -j isn't supported on this platform.",
                       file=sys.stderr)
@@ -203,3 +243,59 @@ def main(args=None):
     if options.enforce and rt.files:
         return_code |= 2
     return return_code
+
+
+def process_unified_diff(stream):
+    original_diff = stream['original_diff']
+    if original_diff:
+        lines = original_diff.split("\n")
+        linenum = 0
+        linenumnew = 0
+        suggestedfix = {}
+        suggestedfix2 = {}
+        isfirsthit = True
+        hunkstart = ''
+        linenr = 0
+
+        pat_diff = re.compile(r'@@ (.[0-9]+\,?[0-9]*) (.[0-9]+\,?[0-9]*) @@')
+        for line in lines:
+
+            if line.startswith('--') or line.startswith('++'):
+                continue
+            if line.startswith('@@'):
+                isfirsthit = False
+                hunkstart = line
+                left, right = pat_diff.match(line).group(1, 2)
+                lstart = left.split(',')[0][1:]
+                rstart = right.split(',')[0][1:]
+                suggestedfix[hunkstart] = {'message': '', 'linenr': 0}
+                linenum = int(lstart)
+                linenumnew = int(rstart)
+                suggestedfix2[hunkstart] = {}
+            elif line.startswith('+'):
+                if not isfirsthit:
+                    isfirsthit = True
+                    linenr = linenumnew
+                    suggestedfix2[hunkstart][linenr] = ''
+                # suggestedfix[hunkstart]['linenr'] = linenr
+                suggestedfix2[hunkstart][linenr] += line + "\n"
+                linenumnew += 1
+            elif line.startswith('-'):
+                if not isfirsthit:
+                    isfirsthit = True
+                    linenr = linenum
+                    suggestedfix2[hunkstart][linenr] = ''
+                    # suggestedfix[difstart]['linenr'] = linenr
+
+                suggestedfix2[hunkstart][linenr] += line + "\n"
+                linenum += 1
+            elif line.startswith(' '):  # consider a context line as a start of a sub hunk
+                linenum += 1
+                linenumnew += 1
+                isfirsthit = False
+                linenr += 1
+                continue
+
+        stream['result'] = suggestedfix2
+
+    return stream

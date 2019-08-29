@@ -245,57 +245,75 @@ def lib23process(fixer_names, flags, explicit, options, refactor_stdin, args):
     return return_code
 
 
-def process_unified_diff(stream):
-    original_diff = stream['original_diff']
+'''
+This returns a json with the following format 
+{  
+   "libmodernize.fixes.fix_dict_six":{  
+      "result":{  
+         "@@ -1,4 +1,5 @@":{  
+            "2":"+import six\n"
+         },
+         "@@ -7,6 +8,6 @@":{  
+            "10":"-x.values()\n-x.itervalues()\n-x.viewvalues()\n+list(x.values())\n+six.itervalues(x)\n+six.viewvalues(x)\n"
+         }
+      },
+      "original_diff":"--- printp3.py\t(original)\n+++ printp3.py\t(refactored)\n@@ -1,4 +1,5 @@\n import ConfigParser\n..."
+   }
+}
+'''
+def process_unified_diff(modernize_output):
+    original_diff = modernize_output['original_diff']
     if original_diff:
-        lines = original_diff.split("\n")
-        linenum = 0
-        linenumnew = 0
-        suggestedfix = {}
-        suggestedfix2 = {}
-        isfirsthit = True
-        hunkstart = ''
-        linenr = 0
+        #Get rid of the first two lines containing ---, +++
+        lines_with_hunk=re.search(r'(\@\@.*(?:\n.*)*)', original_diff, ).group(0)
+        lines = lines_with_hunk.split("\n")
+        line_num_minus = 0
+        line_num_plus = 0
+        suggested_fix = {}
+        context_line_num = 0
 
-        pat_diff = re.compile(r'@@ (.[0-9]+\,?[0-9]*) (.[0-9]+\,?[0-9]*) @@')
+        pat_diff = re.compile(r'@@\s\-([0-9]+\,?[0-9]*)\s\+([0-9]+\,?[0-9]*) @@') # get all except + and -1
+
+
         for line in lines:
-
-            if line.startswith('--') or line.startswith('++'):
-                continue
+            # if line.startswith('--') or line.startswith('++'):
+            #     continue
+            #Make the start of each hunk one group
+            # In each hunk, when there is a contenxt line, make that the start of a sub-group
+            # @@ -1,4 +1,5 @@
+            # - x
+            # + y
+            # context
+            #+xx
+            #sub section 1 = -x +y
+            #sub section 2 = +xx
             if line.startswith('@@'):
                 isfirsthit = False
                 hunkstart = line
-                left, right = pat_diff.match(line).group(1, 2)
-                lstart = left.split(',')[0][1:]
-                rstart = right.split(',')[0][1:]
-                suggestedfix[hunkstart] = {'message': '', 'linenr': 0}
-                linenum = int(lstart)
-                linenumnew = int(rstart)
-                suggestedfix2[hunkstart] = {}
+                left, right = pat_diff.match(line).group(1, 2) #groups
+                line_num_minus = int(left.split(',')[0])
+                line_num_plus = int( right.split(',')[0])
+                suggested_fix[hunkstart] = {}
             elif line.startswith('+'):
                 if not isfirsthit:
                     isfirsthit = True
-                    linenr = linenumnew
-                    suggestedfix2[hunkstart][linenr] = ''
-                # suggestedfix[hunkstart]['linenr'] = linenr
-                suggestedfix2[hunkstart][linenr] += line + "\n"
-                linenumnew += 1
+                    context_line_num = line_num_plus
+                    suggested_fix[hunkstart][context_line_num] = ''
+                suggested_fix[hunkstart][context_line_num] += line + "\n"
+                line_num_plus += 1
             elif line.startswith('-'):
                 if not isfirsthit:
                     isfirsthit = True
-                    linenr = linenum
-                    suggestedfix2[hunkstart][linenr] = ''
-                    # suggestedfix[difstart]['linenr'] = linenr
-
-                suggestedfix2[hunkstart][linenr] += line + "\n"
-                linenum += 1
+                    context_line_num = line_num_minus
+                    suggested_fix[hunkstart][context_line_num] = ''
+                suggested_fix[hunkstart][context_line_num] += line + "\n"
+                line_num_minus += 1
             elif line.startswith(' '):  # consider a context line as a start of a sub hunk
-                linenum += 1
-                linenumnew += 1
+                line_num_minus += 1
+                line_num_plus += 1
                 isfirsthit = False
-                linenr += 1
-                continue
+                context_line_num += 1
 
-        stream['result'] = suggestedfix2
+        modernize_output['result'] = suggested_fix
 
-    return stream
+    return modernize_output

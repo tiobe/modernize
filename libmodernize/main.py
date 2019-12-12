@@ -95,6 +95,8 @@ def main(args=None):
     parser.add_option("--enforce", action="store_true", default=False,
                       help="Returns non-zero exit code if any fixers had to be applied.  "
                            "Useful for enforcing Python 3 compatibility.")
+    parser.add_option("--json", action="store_true", default=False,
+                      help="Returns violations per fixer in JSON format.")
 
     fixer_pkg = 'libmodernize.fixes'
     avail_fixes = set(refactor.get_fixers_from_package(fixer_pkg))
@@ -204,15 +206,17 @@ def main(args=None):
     print(file=sys.stderr)
 
     # Refactor all files and directories passed as arguments
-    list3 = sorted(fixer_names)
+    if options.json:
+        list3 = sorted(fixer_names)
 
-    for n in list(list3):
-        lib23process([n], flags, explicit, options, refactor_stdin, args)
+        for n in list(list3):
+            lib23process([n], flags, explicit, options, refactor_stdin, args)
 
-    json_data = json.dumps(final)
-    print(json_data)
-    return
-
+        json_data = json.dumps(final)
+        print(json_data)
+        return
+    else:
+        lib23process(fixer_names, flags, explicit, options, refactor_stdin, args)
 
 def lib23process(fixer_names, flags, explicit, options, refactor_stdin, args):
     rt = StdoutRefactoringTool(sorted(fixer_names), flags, sorted(explicit),
@@ -222,13 +226,15 @@ def lib23process(fixer_names, flags, explicit, options, refactor_stdin, args):
             rt.refactor_stdin()
         else:
             try:
-
-                with ListStream() as stream:
-                    # stream.data['fixer'] = fixer_names[0];
+                if options.json:
+                    with ListStream() as stream:
+                        # stream.data['fixer'] = fixer_names[0];
+                        rt.refactor(args, options.write, options.doctests_only,
+                                    options.processes)
+                    final[fixer_names[0]] = process_unified_diff(stream.data)
+                else:
                     rt.refactor(args, options.write, options.doctests_only,
                                 options.processes)
-                final[fixer_names[0]] = process_unified_diff(stream.data)
-
             except refactor.MultiprocessingUnsupported:  # pragma: no cover
                 assert options.processes > 1
                 print("Sorry, -j isn't supported on this platform.",
@@ -261,10 +267,12 @@ This returns a json with the following format
    }
 }
 '''
+
+
 def process_unified_diff(modernize_output):
     original_diff = modernize_output['original_diff']
     if original_diff:
-        #Get rid of the first two lines containing ---, +++
+        # Get rid of the first two lines containing ---, +++
         lines_with_hunk=re.search(r'(\@\@.*(?:\n.*)*)', original_diff, ).group(0)
         lines = lines_with_hunk.split("\n")
         line_num_minus = 0
@@ -273,26 +281,26 @@ def process_unified_diff(modernize_output):
         context_line_num = 0
 
         pat_diff = re.compile(r'@@\s\-([0-9]+\,?[0-9]*)\s\+([0-9]+\,?[0-9]*) @@') # get all except + and -1
-
-
         for line in lines:
-            # if line.startswith('--') or line.startswith('++'):
-            #     continue
-            #Make the start of each hunk one group
-            # In each hunk, when there is a contenxt line, make that the start of a sub-group
-            # @@ -1,4 +1,5 @@
-            # - x
-            # + y
-            # context
-            #+xx
-            #sub section 1 = -x +y
-            #sub section 2 = +xx
+            '''
+             if line.startswith('--') or line.startswith('++'):
+                 continue
+            Make the start of each hunk one group
+             In each hunk, when there is a contenxt line, make that the start of a sub-group
+             @@ -1,4 +1,5 @@
+             - x
+             + y
+             context
+            +xx
+            sub section 1 = -x +y
+             sub section 2 = +xx
+            '''
             if line.startswith('@@'):
                 isfirsthit = False
                 hunkstart = line
                 left, right = pat_diff.match(line).group(1, 2) #groups
                 line_num_minus = int(left.split(',')[0])
-                line_num_plus = int( right.split(',')[0])
+                line_num_plus = int(right.split(',')[0])
                 suggested_fix[hunkstart] = {}
             elif line.startswith('+'):
                 if not isfirsthit:

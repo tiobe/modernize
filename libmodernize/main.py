@@ -216,7 +216,7 @@ def main(args=None):
         print(json_data)
         return
     else:
-        lib23process(fixer_names, flags, explicit, options, refactor_stdin, args)
+        return lib23process(fixer_names, flags, explicit, options, refactor_stdin, args)
 
 def lib23process(fixer_names, flags, explicit, options, refactor_stdin, args):
     rt = StdoutRefactoringTool(sorted(fixer_names), flags, sorted(explicit),

@@ -14,6 +14,7 @@ Modernize fix_expect FP
     [Documentation]  Modernize fix_expect FP enforce #27753
     ${result}=  Run Process  python  ${CURDIR}${/}..${/}..${/}modernize.py  -f  fissix.fixes.fix_except  --enforce  ${CURDIR}/test_files/fix_except_test_py3.py
     Should Be Equal As Integers  ${result.rc}  0
+    Should Not Contain  ${result.stdout}  Files that need to be modified
 
 Modernize fix_expect python 2 file TP
     [Documentation]  Modernize fix_expect TP enforce #27753

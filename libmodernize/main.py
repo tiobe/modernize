@@ -293,21 +293,25 @@ def lib23process(fixer_names, flags, explicit, options, refactor_stdin, args):
         options.nobackups,
         not options.no_diffs,
     )
+    has_diff = False
     if not rt.errors:
         if refactor_stdin:
             rt.refactor_stdin()
         else:
             try:
+                # to redirect the stdout
+                # to better detect FPs
+                with ListStream() as stream:
+                    # stream.data['fixer'] = fixer_names[0];
+                    rt.refactor(args, options.write, options.doctests_only,
+                                options.processes)
+                    if stream.data['original_diff']:
+                        has_diff = True
                 if options.json:
-                    with ListStream() as stream:
-                        # stream.data['fixer'] = fixer_names[0];
-                        rt.refactor(args, options.write, options.doctests_only,
-                                    options.processes)
                     final[fixer_names[0]] = process_unified_diff(stream.data)
                 else:
-                    rt.refactor(
-                        args, options.write, options.doctests_only, options.processes
-                    )
+                    print(stream.data['original_diff'])
+
             except refactor.MultiprocessingUnsupported:  # pragma: no cover
                 assert options.processes > 1
                 print("Sorry, -j isn't supported on this platform.", file=sys.stderr)
@@ -316,9 +320,11 @@ def lib23process(fixer_names, flags, explicit, options, refactor_stdin, args):
 
     # Return error status (0 if rt.errors is zero)
     return_code = int(bool(rt.errors))
+
     # If we are enforcing python 3 compatibility, return a non-zero exit code
     # if we had to modify any files.
-    if options.enforce and rt.files:
+    # extra check has_diff to make sure there is an actual recommended change to catch FPs
+    if options.enforce and rt.files and has_diff:
         return_code |= 2
     return return_code
 

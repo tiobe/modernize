@@ -316,7 +316,8 @@ def lib23process(fixer_names, flags, explicit, options, refactor_stdin, args):
                 assert options.processes > 1
                 print("Sorry, -j isn't supported on this platform.", file=sys.stderr)
                 return 1
-        rt.summarize()
+        if rt.files and has_diff:
+            rt.summarize()
 
     # Return error status (0 if rt.errors is zero)
     return_code = int(bool(rt.errors))

@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 3.2.2 (Python 3.8.3 on win32)" generated="20210511 12:04:21.535" rpa="false">
+<suite id="s1" name="Modernize Test" source="D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot\modernize_test.robot">
+<test id="s1-t1" name="Modernize version">
+<kw name="Run Process" library="Process">
+<doc>Runs a process and waits for it to complete.</doc>
+<arguments>
+<arg>python</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot${/}..${/}..${/}modernize.py</arg>
+<arg>--version</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<msg timestamp="20210511 12:04:21.584" level="INFO">Starting process:
+python D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot\..\..\modernize.py --version</msg>
+<msg timestamp="20210511 12:04:21.586" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20210511 12:04:21.740" level="INFO">Process completed.</msg>
+<msg timestamp="20210511 12:04:21.740" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<status status="PASS" starttime="20210511 12:04:21.584" endtime="20210511 12:04:21.740"></status>
+</kw>
+<kw name="Should Contain" library="BuiltIn">
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<arguments>
+<arg>${result.stdout}</arg>
+<arg>TIOBE</arg>
+</arguments>
+<status status="PASS" starttime="20210511 12:04:21.740" endtime="20210511 12:04:21.741"></status>
+</kw>
+<doc>Modernize version</doc>
+<status status="PASS" starttime="20210511 12:04:21.583" endtime="20210511 12:04:21.741" critical="yes"></status>
+</test>
+<test id="s1-t2" name="Modernize fix_expect FP">
+<kw name="Run Process" library="Process">
+<doc>Runs a process and waits for it to complete.</doc>
+<arguments>
+<arg>python</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot${/}..${/}..${/}modernize.py</arg>
+<arg>-f</arg>
+<arg>fissix.fixes.fix_except</arg>
+<arg>--enforce</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot/test_files/fix_except_test_py3.py</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<msg timestamp="20210511 12:04:21.743" level="INFO">Starting process:
+python D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot\..\..\modernize.py -f fissix.fixes.fix_except --enforce D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot/test_files/fix_except_test_py3.py</msg>
+<msg timestamp="20210511 12:04:21.744" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20210511 12:04:21.907" level="INFO">Process completed.</msg>
+<msg timestamp="20210511 12:04:21.907" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<status status="PASS" starttime="20210511 12:04:21.742" endtime="20210511 12:04:21.907"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${result.rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20210511 12:04:21.908" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" starttime="20210511 12:04:21.907" endtime="20210511 12:04:21.908"></status>
+</kw>
+<kw name="Should Not Contain" library="BuiltIn">
+<doc>Fails if ``container`` contains ``item`` one or more times.</doc>
+<arguments>
+<arg>${result.stdout}</arg>
+<arg>Files that need to be modified</arg>
+</arguments>
+<status status="PASS" starttime="20210511 12:04:21.908" endtime="20210511 12:04:21.908"></status>
+</kw>
+<doc>Modernize fix_expect FP enforce #27753</doc>
+<status status="PASS" starttime="20210511 12:04:21.742" endtime="20210511 12:04:21.909" critical="yes"></status>
+</test>
+<test id="s1-t3" name="Modernize fix_expect python 2 file TP">
+<kw name="Run Process" library="Process">
+<doc>Runs a process and waits for it to complete.</doc>
+<arguments>
+<arg>python</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot${/}..${/}..${/}modernize.py</arg>
+<arg>-f</arg>
+<arg>fissix.fixes.fix_except</arg>
+<arg>--enforce</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot/test_files/fix_except_test_py2.py</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<msg timestamp="20210511 12:04:21.911" level="INFO">Starting process:
+python D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot\..\..\modernize.py -f fissix.fixes.fix_except --enforce D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot/test_files/fix_except_test_py2.py</msg>
+<msg timestamp="20210511 12:04:21.912" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20210511 12:04:22.070" level="INFO">Process completed.</msg>
+<msg timestamp="20210511 12:04:22.071" level="INFO">${result} = &lt;result object with rc 2&gt;</msg>
+<status status="PASS" starttime="20210511 12:04:21.911" endtime="20210511 12:04:22.071"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${result.rc}</arg>
+<arg>2</arg>
+</arguments>
+<msg timestamp="20210511 12:04:22.071" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" starttime="20210511 12:04:22.071" endtime="20210511 12:04:22.071"></status>
+</kw>
+<doc>Modernize fix_expect TP enforce #27753</doc>
+<status status="PASS" starttime="20210511 12:04:21.910" endtime="20210511 12:04:22.072" critical="yes"></status>
+</test>
+<test id="s1-t4" name="Modernize fix_assert support">
+<kw name="Run Process" library="Process">
+<doc>Runs a process and waits for it to complete.</doc>
+<arguments>
+<arg>python</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot${/}..${/}..${/}modernize.py</arg>
+<arg>--enforce</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot/test_files/fix_asserts.py</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<msg timestamp="20210511 12:04:22.073" level="INFO">Starting process:
+python D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot\..\..\modernize.py --enforce D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot/test_files/fix_asserts.py</msg>
+<msg timestamp="20210511 12:04:22.075" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20210511 12:04:22.359" level="INFO">Process completed.</msg>
+<msg timestamp="20210511 12:04:22.359" level="INFO">${result} = &lt;result object with rc 2&gt;</msg>
+<status status="PASS" starttime="20210511 12:04:22.073" endtime="20210511 12:04:22.359"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${result.rc}</arg>
+<arg>2</arg>
+</arguments>
+<msg timestamp="20210511 12:04:22.359" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" starttime="20210511 12:04:22.359" endtime="20210511 12:04:22.359"></status>
+</kw>
+<doc>Modernize should now support fix_assert #28112</doc>
+<status status="PASS" starttime="20210511 12:04:22.072" endtime="20210511 12:04:22.359" critical="yes"></status>
+</test>
+<test id="s1-t5" name="Modernize fix_assert support json test">
+<kw name="Run Process" library="Process">
+<doc>Runs a process and waits for it to complete.</doc>
+<arguments>
+<arg>python</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot${/}..${/}..${/}modernize.py</arg>
+<arg>--json</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot/test_files/fix_asserts.py</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<msg timestamp="20210511 12:04:22.359" level="INFO">Starting process:
+python D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot\..\..\modernize.py --json D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot/test_files/fix_asserts.py</msg>
+<msg timestamp="20210511 12:04:22.359" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20210511 12:04:22.725" level="INFO">Process completed.</msg>
+<msg timestamp="20210511 12:04:22.725" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<status status="PASS" starttime="20210511 12:04:22.359" endtime="20210511 12:04:22.725"></status>
+</kw>
+<kw name="Evaluate" library="BuiltIn">
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<arguments>
+<arg>${result.stdout}</arg>
+</arguments>
+<assign>
+<var>${test}</var>
+</assign>
+<msg timestamp="20210511 12:04:22.727" level="INFO">${test} = {'fissix.fixes.fix_apply': {'result': {}, 'original_diff': ''}, 'fissix.fixes.fix_asserts': {'result': {'@@ -5,4 +5,4 @@': {'8': '-        self.assertEquals(fun(3), 4)\n+        self.assertEqual(fun(3...</msg>
+<status status="PASS" starttime="20210511 12:04:22.725" endtime="20210511 12:04:22.727"></status>
+</kw>
+<kw name="Dictionary Should Contain Key" library="Collections">
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<arguments>
+<arg>${test}</arg>
+<arg>fissix.fixes.fix_asserts</arg>
+</arguments>
+<status status="PASS" starttime="20210511 12:04:22.727" endtime="20210511 12:04:22.727"></status>
+</kw>
+<doc>Modernize should now support fix_assert #28112</doc>
+<status status="PASS" starttime="20210511 12:04:22.359" endtime="20210511 12:04:22.727" critical="yes"></status>
+</test>
+<test id="s1-t6" name="Modernize python 2">
+<kw name="Run Process" library="Process">
+<doc>Runs a process and waits for it to complete.</doc>
+<arguments>
+<arg>python</arg>
+<arg>-B</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot${/}..${/}..${/}modernize.py</arg>
+<arg>--enforce</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot/test_files/py2.py</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<msg timestamp="20210511 12:04:22.729" level="INFO">Starting process:
+python -B D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot\..\..\modernize.py --enforce D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot/test_files/py2.py</msg>
+<msg timestamp="20210511 12:04:22.730" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20210511 12:04:23.025" level="INFO">Process completed.</msg>
+<msg timestamp="20210511 12:04:23.025" level="INFO">${result} = &lt;result object with rc 2&gt;</msg>
+<status status="PASS" starttime="20210511 12:04:22.729" endtime="20210511 12:04:23.025"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${result.rc}</arg>
+<arg>2</arg>
+</arguments>
+<msg timestamp="20210511 12:04:23.025" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" starttime="20210511 12:04:23.025" endtime="20210511 12:04:23.025"></status>
+</kw>
+<doc>Modernize with enforce option - python 2 #26566</doc>
+<status status="PASS" starttime="20210511 12:04:22.728" endtime="20210511 12:04:23.025" critical="yes"></status>
+</test>
+<test id="s1-t7" name="Modernize python 3">
+<kw name="Run Process" library="Process">
+<doc>Runs a process and waits for it to complete.</doc>
+<arguments>
+<arg>python</arg>
+<arg>-B</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot${/}..${/}..${/}modernize.py</arg>
+<arg>--enforce</arg>
+<arg>D:\\Checkers\\ASMLpythonmigration\\v08_tiobe_new\\python-modernize\\tests\\robot/test_files/py3.py</arg>
+</arguments>
+<assign>
+<var>${result}</var>
+</assign>
+<msg timestamp="20210511 12:04:23.040" level="INFO">Starting process:
+python -B D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot\..\..\modernize.py --enforce D:\Checkers\ASMLpythonmigration\v08_tiobe_new\python-modernize\tests\robot/test_files/py3.py</msg>
+<msg timestamp="20210511 12:04:23.042" level="INFO">Waiting for process to complete.</msg>
+<msg timestamp="20210511 12:04:23.345" level="INFO">Process completed.</msg>
+<msg timestamp="20210511 12:04:23.346" level="INFO">${result} = &lt;result object with rc 0&gt;</msg>
+<status status="PASS" starttime="20210511 12:04:23.040" endtime="20210511 12:04:23.346"></status>
+</kw>
+<kw name="Should Be Equal As Integers" library="BuiltIn">
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<arguments>
+<arg>${result.rc}</arg>
+<arg>0</arg>
+</arguments>
+<msg timestamp="20210511 12:04:23.346" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;type 'unicode'&gt;</msg>
+<status status="PASS" starttime="20210511 12:04:23.346" endtime="20210511 12:04:23.346"></status>
+</kw>
+<doc>Modernize with enforce option - python 3 #26566</doc>
+<status status="PASS" starttime="20210511 12:04:23.025" endtime="20210511 12:04:23.347" critical="yes"></status>
+</test>
+<doc>Modernize version</doc>
+<status status="PASS" starttime="20210511 12:04:21.536" endtime="20210511 12:04:23.348"></status>
+</suite>
+<statistics>
+<total>
+<stat pass="7" fail="0">Critical Tests</stat>
+<stat pass="7" fail="0">All Tests</stat>
+</total>
+<tag>
+</tag>
+<suite>
+<stat pass="7" fail="0" id="s1" name="Modernize Test">Modernize Test</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

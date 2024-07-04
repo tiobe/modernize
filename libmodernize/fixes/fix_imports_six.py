@@ -50,7 +50,7 @@ class FixImportsSix(fix_imports.FixImports):
         "tkCommonDialog": "six.moves.tkinter_commondialog",
         "Tkconstants": "six.moves.tkinter_constants",
         "Tkdnd": "six.moves.tkinter_dnd",
-        "tkFileDialog": "six.moves.tkinter_filedialog",
+        "tkFileDialog": "six.moves.tkinter_tkfiledialog",
         "tkFont": "six.moves.tkinter_font",
         "Tkinter": "six.moves.tkinter",
         "tkMessageBox": "six.moves.tkinter_messagebox",
